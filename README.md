@@ -1,15 +1,14 @@
-# Wellcome to MindPhaser34_infra
+# MindPhaser34_infra
 Студент: Брыкин Артём (MindPhaser34)
 
-- [Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами](## Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами.) )
-- [Занятие 6: Основные сервисы Google Cloud Platform (GCP) ](## Занятие 6: Основные сервисы Google Cloud Platform (GCP). )
+[TOC]
 
-
-## Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами.
+### Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами.
 Для выполнения задания были заведены 2 ВМ
-
+```shell
 bastion_IP = 34.77.189.138
 someinternalhost_IP =10.132.0.3
+```
 
 Был создан и подключен общий пользователь mindphaser33, путём генерации пары ключей SSH на локальном хосте и добавления публичного ключа в проект GCP
 
@@ -25,6 +24,7 @@ eval "$(ssh-agent)" && ssh-add ~/.ssh/id_rsa && ssh -A mindphaser33@34.77.189.13
     echo "eval "$(ssh-agent)" && ssh-add ~/.ssh/id_rsa" >> ~/.bashrc
 
 после чего запускать подключение комндой **someinternalhost**.
+
 
 2. Вариант решения для подключения из консоли при помощи команды вида ssh someinternalhost из локальной консоли рабочего устройства, чтобы подключение выполнялось по алиасу someinternalhost:
 Создаём файл **~/.ssh/config** со следующим содержимым:
@@ -54,7 +54,7 @@ Host someinternalhost
 С помощью сервиса sslip.io было сгенерировано DNS-имя **https://34-77-189-138.sslip.io/**, которое было задействовано в настройках VPN-сервера, в поле Let's Encrypt  для автоматической генерации сертификата.
 
 
-## Занятие 6: Основные сервисы Google Cloud Platform (GCP).
+### Занятие 6: Основные сервисы Google Cloud Platform (GCP).
 
 Для выполнения ДЗ было создано 4 скрипта
 1) install_ruby.sh
@@ -122,6 +122,7 @@ gcloud compute instances create reddit-app \
   --restart-on-failure \
   --metadata startup-script-url=gs://otus-backet/startup.sh
 ```
+
 Создания правила брандмауэра из консоли gloud:
 ```shell 
 gcloud compute --project=mindphaser34-infra firewall-rules create default-puma-server --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:9292 --source-ranges=0.0.0.0/24 --target-tags=puma-server

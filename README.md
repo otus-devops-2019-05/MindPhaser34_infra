@@ -2,8 +2,9 @@
 Студент: Брыкин Артём (MindPhaser34)
 
 Список ДЗ к занятиям:
-- [Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами](https://github.com/otus-devops-2019-05/MindPhaser34_infra/blob/cloud-testapp/README.md#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-5-%D0%B7%D0%BD%D0%B0%D0%BA%D0%BE%D0%BC%D1%81%D1%82%D0%B2%D0%BE-%D1%81-%D0%BE%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D0%BE%D0%B9-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BE%D0%B9-%D0%B8-%D0%BE%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D1%8B%D0%BC%D0%B8-%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D0%B0%D0%BC%D0%B8).
+- [Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами](https://github.com/otus-devops-2019-05/MindPhaser34_infra/blob/cloud-testapp/README.md#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-5-%D0%B7%D0%BD%D0%B0%D0%BA%D0%BE%D0%BC%D1%81%D1%82%D0%B2%D0%BE-%D1%81-%D0%BE%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D0%BE%D0%B9-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BE%D0%B9-%D0%B8-%D0%BE%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D1%8B%D0%BC%D0%B8-%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D0%B0%D0%BC%D0%B8)
 - [Занятие 6: Основные сервисы Google Cloud Platform (GCP)](https://github.com/otus-devops-2019-05/MindPhaser34_infra/blob/cloud-testapp/README.md#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-6-%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5-%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D1%8B-google-cloud-platform-gcp " Занятие 6: Основные сервисы Google Cloud Platform (GCP)")
+- [Занятие 7: Модели управления инфраструктурой](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/packer-base#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-7-%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8-%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BE%D0%B9)
 
 ### Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами.
 Для выполнения задания были заведены 2 ВМ
@@ -130,3 +131,43 @@ gcloud compute instances create reddit-app \
 ```shell 
 gcloud compute --project=mindphaser34-infra firewall-rules create default-puma-server --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:9292 --source-ranges=0.0.0.0/0 --target-tags=puma-server
 ```
+
+### Занятие 7: Модели управления инфраструктурой.
+В рамках самостоятельной работы был создан шаблон для packer 
+**ubuntu16.json**  - основной шаблон packer с указанием дополнительных параметров (Описание образа, Размер и тип диска,  Название сети, Теги)
+**variables.json** - отдальные пользовательские переменные, файл помещён в .gitignore
+**variables.json.example** - копия variables.json, но с изменёнными данными
+чтобы запустить сборку образа с нашим шаблоном необходимо выполнить команду:
+```shell
+packer build -var-file=variables.json template.json
+```
+**Задание со звёздочкой 1**
+Создан шаблон immutable.json, папка files, куда скопирован файл startup.sh из прошлого задания, а так же создана служба для запуска Puma Server:
+```shell
+[Unit]
+Description=Puma-Server
+After=network.target
+
+[Service]
+Type=simple
+
+WorkingDirectory=/home/appuser/reddit
+ExecStart=/usr/local/bin/pumactl start &>> /dev/null
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+Данный файл копируется при создании обараз в домашнюю папку пользователя, затем переносится в /etc/systemd/system и включается в качестве сервиса системы.
+
+При запуске 
+```shell
+packer build immutable.json
+```
+формируется образ, который мы вставляем в при создании инстанса в GUI. Дополнительно необходимо указать название инстанса и тэги сети.
+
+**Задание со звёздочкой 2**
+```shell
+gcloud compute instances create reddit-full --image reddit-full-1561831493 --machine-type=g1-small --tags puma-server
+```
+работу инстанса можно проверить по адресу: 34.76.99.213:9292

@@ -1,0 +1,4 @@
+{
+    "project_id": "ha-ha-infra",
+    "source_image_family": "ubuntu-2019-lts"
+}

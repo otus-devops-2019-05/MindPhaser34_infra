@@ -130,3 +130,43 @@ gcloud compute instances create reddit-app \
 ```shell 
 gcloud compute --project=mindphaser34-infra firewall-rules create default-puma-server --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:9292 --source-ranges=0.0.0.0/0 --target-tags=puma-server
 ```
+
+### Занятие 7: Модели управления инфраструктурой.
+В рамках самостоятельной работы был создан шаблон для packer 
+**ubuntu16.json**  - основной шаблон packer с указанием дополнительных параметров (Описание образа, Размер и тип диска,  Название сети, Теги)
+**variables.json** - отдальные пользовательские переменные, файл помещён в .gitignore
+**variables.json.example** - копия variables.json, но с изменёнными данными
+чтобы запустить сборку образа с нашим шаблоном необходимо выполнить команду:
+```shell
+packer build -var-file=variables.json template.json
+```
+**Задание со звёздочкой 1**
+Создан шаблон immutable.json, папка files, куда скопирован файл startup.sh из прошлого задания, а так же создана служба для запуска Puma Server:
+```shell
+[Unit]
+Description=Puma-Server
+After=network.target
+
+[Service]
+Type=simple
+
+WorkingDirectory=/home/appuser/reddit
+ExecStart=/usr/local/bin/pumactl start &>> /dev/null
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+Данный файл копируется при создании обараз в домашнюю папку пользователя, затем переносится в /etc/systemd/system и включается в качестве сервиса системы.
+
+При запуске 
+```shell
+packer build immutable.json
+```
+формируется образ, который мы вставляем в при создании инстанса в GUI. Дополнительно необходимо указать название инстанса и тэги сети.
+
+**Задание со звёздочкой 2**
+```shell
+gcloud compute instances create reddit-full --image reddit-full-1561831493 --machine-type=g1-small --tags puma-server
+```
+работу инстанса можно проверить по адресу: 34.76.99.213:9292

@@ -30,5 +30,5 @@ variable zone {
 
 variable "count" {
   description = "Number of VMs"
-  default = "1"
+  default     = "1"
 }

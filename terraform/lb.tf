@@ -5,8 +5,8 @@ terraform {
 
 # Group
 resource "google_compute_instance_group" "instance-group-1" {
-  name  = "instance-group-1"
-  zone = "${var.zone}"
+  name      = "instance-group-1"
+  zone      = "${var.zone}"
   instances = ["${google_compute_instance.app.*.self_link}"]
 
   named_port {
@@ -17,11 +17,11 @@ resource "google_compute_instance_group" "instance-group-1" {
 
 # Backend Services
 resource "google_compute_backend_service" "lb-back" {
-  name             = "lb-back"
-  protocol         = "HTTP"
-  timeout_sec      = "10"
+  name        = "lb-back"
+  protocol    = "HTTP"
+  timeout_sec = "10"
 
-backend {
+  backend {
     group = "${google_compute_instance_group.instance-group-1.self_link}"
   }
 
@@ -39,13 +39,13 @@ resource "google_compute_http_health_check" "lb-healthchk" {
 
 # LB Proxy
 resource "google_compute_target_http_proxy" "lb-proxy" {
-  name        = "lb-proxy"
-  url_map     = "${google_compute_url_map.lb.self_link}"
+  name    = "lb-proxy"
+  url_map = "${google_compute_url_map.lb.self_link}"
 }
 
 # Mapping proxy with backend
 resource "google_compute_url_map" "lb" {
-  name        = "lb"
+  name            = "lb"
   default_service = "${google_compute_backend_service.lb-back.self_link}"
 }
 

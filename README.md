@@ -5,7 +5,7 @@
 - [Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами](https://github.com/otus-devops-2019-05/MindPhaser34_infra/blob/cloud-testapp/README.md#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-5-%D0%B7%D0%BD%D0%B0%D0%BA%D0%BE%D0%BC%D1%81%D1%82%D0%B2%D0%BE-%D1%81-%D0%BE%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D0%BE%D0%B9-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BE%D0%B9-%D0%B8-%D0%BE%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D1%8B%D0%BC%D0%B8-%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D0%B0%D0%BC%D0%B8)
 - [Занятие 6: Основные сервисы Google Cloud Platform (GCP)](https://github.com/otus-devops-2019-05/MindPhaser34_infra/blob/cloud-testapp/README.md#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-6-%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5-%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D1%8B-google-cloud-platform-gcp " Занятие 6: Основные сервисы Google Cloud Platform (GCP)")
 - [Занятие 7: Модели управления инфраструктурой](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/packer-base#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-7-%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8-%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BE%D0%B9)
-- [Занятие 8: Практика Infrastructure as a Code (IaC)]
+- [Занятие 8: Практика Infrastructure as a Code (IaC)](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/terraform-1#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-8-%D0%BF%D1%80%D0%B0%D0%BA%D1%82%D0%B8%D0%BA%D0%B0-infrastructure-as-a-code-iac)
 
 ### Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами.
 Для выполнения задания были заведены 2 ВМ
@@ -175,7 +175,8 @@ gcloud compute instances create reddit-full --image reddit-full-1561831493 --mac
 
 
 ### Занятие 8: Практика Infrastructure as a Code (IaC)
-1. Самостоятельное задание
+1. Самостоятельное задание.
+
 **main.ft**
 ```
 resource "google_compute_instance" "app" {
@@ -208,7 +209,8 @@ variable zone {
 }
 ```
 
-2. Задание co *
+2. Задание co *.
+
 Чтобы добавить несколько пользователей, необходимо в main.tf изменить следующее
 ```
   metadata {
@@ -238,7 +240,8 @@ POST https://www.googleapis.com/compute/v1/projects/[PROJECT_ID]/zones/[ZONE]/in
 ssh -i ~/.ssh/appuser_web appuser_web@ip
 ```
 
-3. Задание с **
+3. Задание с **.
+
 В рамках задания был создан файл с lb.tf, в котором разворачивался балансировщик с группами инстансов в нужном количестве. В файл с переменными (**variables.tf**) была добавлена переменная **count**, в которой задано описание и значение по-умолчанию (**default**) равное 1. Чтобы изменить количество разворачиваемых инстансов в группе инстансов достаточно поменять значение данной переменной.
 Так же были подправлены выходные данные в файле **outputs.tf**
 ```shell

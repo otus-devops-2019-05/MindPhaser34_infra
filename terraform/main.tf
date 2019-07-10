@@ -23,7 +23,7 @@ resource "google_compute_instance" "app" {
   }
 
   metadata {
-    ssh-keys = "appuser:${file(var.public_key_path)}\nappuser1:${file(var.public_key_path)}\nappuser2:${file(var.public_key_path)}\nappuser_web::${file(var.public_key_path_appuser_web)}"
+    ssh-keys = "appuser:${file(var.public_key_path)}\nappuser1:${file(var.public_key_path)}\nappuser2:${file(var.public_key_path)}\nappuser_web:${file(var.public_key_path_appuser_web)}"
   }
 
   tags = ["puma-server"]

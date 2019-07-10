@@ -5,6 +5,7 @@
 - [Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами](https://github.com/otus-devops-2019-05/MindPhaser34_infra/blob/cloud-testapp/README.md#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-5-%D0%B7%D0%BD%D0%B0%D0%BA%D0%BE%D0%BC%D1%81%D1%82%D0%B2%D0%BE-%D1%81-%D0%BE%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D0%BE%D0%B9-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BE%D0%B9-%D0%B8-%D0%BE%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D1%8B%D0%BC%D0%B8-%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D0%B0%D0%BC%D0%B8)
 - [Занятие 6: Основные сервисы Google Cloud Platform (GCP)](https://github.com/otus-devops-2019-05/MindPhaser34_infra/blob/cloud-testapp/README.md#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-6-%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%BD%D1%8B%D0%B5-%D1%81%D0%B5%D1%80%D0%B2%D0%B8%D1%81%D1%8B-google-cloud-platform-gcp " Занятие 6: Основные сервисы Google Cloud Platform (GCP)")
 - [Занятие 7: Модели управления инфраструктурой](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/packer-base#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-7-%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8-%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BE%D0%B9)
+- [Занятие 8: Практика Infrastructure as a Code (IaC)](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/terraform-1#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-8-%D0%BF%D1%80%D0%B0%D0%BA%D1%82%D0%B8%D0%BA%D0%B0-infrastructure-as-a-code-iac)
 
 ### Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами.
 Для выполнения задания были заведены 2 ВМ
@@ -171,3 +172,85 @@ packer build immutable.json
 gcloud compute instances create reddit-full --image reddit-full-1561831493 --machine-type=g1-small --tags puma-server
 ```
 работу инстанса можно проверить по адресу: 34.76.99.213:9292
+
+
+### Занятие 8: Практика Infrastructure as a Code (IaC)
+1. Самостоятельное задание.
+
+**main.ft**
+```
+resource "google_compute_instance" "app" {
+  ...
+  zone         = "${var.zone}"
+  ...
+ connection {
+  ...
+  private_key = "${file(var.private_key_path)}"
+```
+
+**terraform.tfvars**
+```
+project = "mindphaser34-infra"
+public_key_path = "~/.ssh/appuser.pub"
+private_key_path="~/.ssh/appuser"
+zone="europe-west1-b"
+disk_image = "reddit-base"
+```
+
+**variables.tf**
+```
+...
+variable private_key_path {
+  description = "Path to the private key used for ssh access"
+}
+variable zone {
+  description = "Zone"
+  default     = "europe-west1-b"
+}
+```
+
+2. Задание co *.
+
+Чтобы добавить несколько пользователей, необходимо в main.tf изменить следующее
+```
+  metadata {
+    ssh-keys = "appuser:${file(var.public_key_path)}\nappuser1:${file(var.public_key_path)}\nappuser2:${file(var.public_key_path)}"
+  }
+```
+Чтобы добавить ключ пользователя appuser_web в веб-интерфейс, необходимо сначала его сгенерировать
+```shell
+ssh-keygen -C appuser_web -f ~/.ssh/appuser_web -t rsa -b 2048
+```
+И после вставить в веб-интерфейс. При добавлении данного ключа в конфиг terraform и выполнении команды apply - невозможно зайти под данным пользователем на инстанс, так как по-умолчанию проектные ключи не распространяются на инстансы. ЧТобы это исправить, необходимо через curl вызвать следующую команду:
+```shell
+POST https://www.googleapis.com/compute/v1/projects/[PROJECT_ID]/zones/[ZONE]/instances/[INSTANCE_NAME]/setMetadata
+
+ {
+ "items": [
+  {
+   "key": "block-project-ssh-keys",
+   "value": FALSE
+  }
+ ]
+ "fingerprint": "[FINGERPRINT]"
+ }
+```
+либо подкидывать файл ключа вручную
+```shell
+ssh -i ~/.ssh/appuser_web appuser_web@ip
+```
+
+3. Задание с **.
+
+В рамках задания был создан файл с lb.tf, в котором разворачивался балансировщик с группами инстансов в нужном количестве. В файл с переменными (**variables.tf**) была добавлена переменная **count**, в которой задано описание и значение по-умолчанию (**default**) равное 1. Чтобы изменить количество разворачиваемых инстансов в группе инстансов достаточно поменять значение данной переменной.
+Так же были подправлены выходные данные в файле **outputs.tf**
+```shell
+output "app_external_ip" {
+  value = "${google_compute_instance.app.*.network_interface.0.access_config.0.nat_ip}"
+
+}
+output "load-balancer-ip" {
+  value = "${google_compute_global_forwarding_rule.lb-fwd.ip_address}"
+}
+```
+

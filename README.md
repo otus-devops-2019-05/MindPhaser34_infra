@@ -7,6 +7,7 @@
 - [Занятие 7: Модели управления инфраструктурой](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/packer-base#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-7-%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8-%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BE%D0%B9)
 - [Занятие 8: Практика Infrastructure as a Code (IaC)](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/terraform-1#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-8-%D0%BF%D1%80%D0%B0%D0%BA%D1%82%D0%B8%D0%BA%D0%B0-infrastructure-as-a-code-iac)
 - [Занятие 9: Принципы организации инфраструктурного кода и работа над инфраструктурой в команде на примере Terraform](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/terraform-2#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-9-%D0%BF%D1%80%D0%B8%D0%BD%D1%86%D0%B8%D0%BF%D1%8B-%D0%BE%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BA%D0%BE%D0%B4%D0%B0-%D0%B8-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D0%BD%D0%B0%D0%B4-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BE%D0%B9-%D0%B2-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B5-%D0%BD%D0%B0-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D0%B5-terraform)
+- [Занятие 10: Управление конфигурацией]()
 
 ### Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами.
 Для выполнения задания были заведены 2 ВМ
@@ -276,3 +277,30 @@ terraform {
 }
 ```
 где вместо XX вставляем номер бакета для соотвествующего окружения
+
+### Занятие 10: Управление конфигурацией
+Для запуска плейбука c клонированием ветки используем
+```
+ansible-playbook clone.yml
+```
+
+Для выполнения комманд на хостe app используем
+```
+ansible app -m command -a "rm -rf ~/reddit"
+```
+- Ансибл удаляет папку reddit
+- При повторном запускеплейбука клонирования будет произведено изменения, о чём  и сообщит ансибл (changed)
+
+**clone.yml**:
+
+```shell
+---
+- name: Clone
+  hosts: app
+  tasks:
+    - name: Clone repo
+      git:
+        repo: https://github.com/express42/reddit.git
+        dest: /home/appuser/reddit
+```
+

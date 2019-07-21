@@ -308,22 +308,29 @@ ansible app -m command -a "rm -rf ~/reddit"
 ### Занятие 11: Продолжение знакомства с Ansible: templates, handlers, dynamic inventory, vault, tags.
 В рамках заданий были созданы следующие файлы:
 **reddit_app_one_play.yml** - один плейбук, один сценарий
+
 **reddit_app_multiple_plays.yml** - один плейбук, несколько сценариев
+
 Несколько плейбуков:
+
 **site.yml** - общий плейбук управления конфигурацией в инфраструктуре
+
 **app.yml** - для приложения
+
 **db.yml** - для БД
+
 **deploy.yml** - для деплоя
+
 **inventory.yml** - статически описываем наши хотсы вместе с группами
+
 **packer_app.yml** - устанавливает Ruby и Bundler
+
 **packer_db.yml** - добавляет репозиторий MongoDB,
 
-файлы 
-packer/app.json 
-packer/db.json
-скопированы на уровень выше, чтобы сделать изменения в provisioners
+файлы packer/app.json, packer/db.json скопированы на уровень выше, чтобы сделать изменения в provisioners
 
 **inventory.gce.yml** - файл динамической инвентариции, который используется по-умолчанию (прописан в ansible.cfg)
+
 ```shell
 ---
 plugin: gcp_compute
@@ -349,15 +356,25 @@ compose:
 ```
 
 Для того, чтобы использовать воспользоваться динамической инвенторизацией, необходимо создать и Service Account. Это можно сделать с помощью gcloud:
+
 gcloud beta iam service-accounts create [SA-NAME] --description "[SA-DESCRIPTION]" --display-name "[SA-DISPLAY-NAME]"
+
 Проверяем, что аккаунт создался:
+
 gcloud iam service-accounts list
+
 По ссылке узнаём присвоенный e-mail:
+
 https://console.cloud.google.com/iam-admin/serviceaccounts
+
 И даём ему необхожимые права:
+
 gcloud projects add-iam-policy-binding [PROJECT-NAME] --member serviceAccount:[SA-NAME]@m[PROJECT-NAME].iam.gserviceaccount.com --role roles/editor
+
 экспортируем ключи в файл key.json:
+
 gcloud iam service-accounts keys create ./key.json --iam-account [SA-NAME]@m[PROJECT-NAME].iam.gserviceaccount.com
+
 И прописываем его в ansible.cfg  в качестве inventory
 
 Чтобы проверить работоспособность, достаточно запустить 

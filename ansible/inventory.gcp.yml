@@ -1,0 +1,22 @@
+---
+plugin: gcp_compute
+projects:
+  - mindphaser34-infra
+regions:
+  - europe-west-1
+hostnames:
+  - name
+  - private_ip
+  - public_ip
+keyed_groups:
+  - key: zone
+groups:
+  app: "'-app-' in name"
+  db: "'-db-' in name"
+filters: []
+auth_kind: serviceaccount
+service_account_file: key.json
+scopes: https://www.googleapis.com/auth/compute
+compose:
+  ansible_host: networkInterfaces[0].accessConfigs[0].natIP
+

@@ -19,9 +19,15 @@ resource "google_compute_instance" "db" {
   #  tags = ["puma-server"]
 
   network_interface {
-    network       = "default"
-    access_config = {}
+    network = "default"
+    access_config {
+      nat_ip = "${google_compute_address.db_ip.address}"
+    }
   }
+}
+
+resource "google_compute_address" "db_ip" {
+  name = "reddit-db-ip"
 }
 
 # Правило firewall

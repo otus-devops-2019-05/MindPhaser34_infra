@@ -16,11 +16,6 @@ variable "count" {
   default     = "1"
 }
 
-variable "db-ip" {
-  description = "IP of mongodb"
-  default     = "localhost"
-}
-
 variable app_disk_image {
   description = "Disk image for reddit app"
   default     = "reddit-app-base"

@@ -9,6 +9,8 @@
 - [Занятие 9: Принципы организации инфраструктурного кода и работа над инфраструктурой в команде на примере Terraform](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/terraform-2#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-9-%D0%BF%D1%80%D0%B8%D0%BD%D1%86%D0%B8%D0%BF%D1%8B-%D0%BE%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BA%D0%BE%D0%B4%D0%B0-%D0%B8-%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0-%D0%BD%D0%B0%D0%B4-%D0%B8%D0%BD%D1%84%D1%80%D0%B0%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%BE%D0%B9-%D0%B2-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B5-%D0%BD%D0%B0-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D0%B5-terraform)
 - [Занятие 10: Управление конфигурацией](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/ansible-1#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-10-%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5-%D0%BA%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D0%B5%D0%B9)
 - [Занятие 11: Продолжение знакомства с Ansible: templates, handlers, dynamic inventory, vault, tags.](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/ansible-2#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-11-%D0%BF%D1%80%D0%BE%D0%B4%D0%BE%D0%BB%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B7%D0%BD%D0%B0%D0%BA%D0%BE%D0%BC%D1%81%D1%82%D0%B2%D0%B0-%D1%81-ansible-templates-handlers-dynamic-inventory-vault-tags)
+- [Занятие 12: Принципы организации кода для управления конфигурацией]()
+
 
 ### Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами.
 Для выполнения задания были заведены 2 ВМ
@@ -327,8 +329,6 @@ ansible app -m command -a "rm -rf ~/reddit"
 
 **packer_db.yml** - добавляет репозиторий MongoDB,
 
-файлы packer/app.json, packer/db.json скопированы на уровень выше, чтобы сделать изменения в provisioners
-
 **inventory.gce.yml** - файл динамической инвентариции, который используется по-умолчанию (прописан в ansible.cfg)
 
 ```shell
@@ -356,29 +356,42 @@ compose:
 ```
 
 Для того, чтобы использовать воспользоваться динамической инвенторизацией, необходимо создать и Service Account. Это можно сделать с помощью gcloud:
-
+```shell
 gcloud beta iam service-accounts create [SA-NAME] --description "[SA-DESCRIPTION]" --display-name "[SA-DISPLAY-NAME]"
-
+```
 Проверяем, что аккаунт создался:
-
+```shell
 gcloud iam service-accounts list
-
+```
 По ссылке узнаём присвоенный e-mail:
 
 https://console.cloud.google.com/iam-admin/serviceaccounts
 
 И даём ему необхожимые права:
-
+```shell
 gcloud projects add-iam-policy-binding [PROJECT-NAME] --member serviceAccount:[SA-NAME]@m[PROJECT-NAME].iam.gserviceaccount.com --role roles/editor
-
+```
 экспортируем ключи в файл key.json:
-
+```shell
 gcloud iam service-accounts keys create ./key.json --iam-account [SA-NAME]@m[PROJECT-NAME].iam.gserviceaccount.com
-
+```
 И прописываем его в ansible.cfg  в качестве inventory
 
 Чтобы проверить работоспособность, достаточно запустить 
 ```shell
 ansible-inventory -i inventory.gcp.yml --graph
 ```
+
+### Занятие 12: Принципы организации кода для управления конфигурацией.
+
+Созданы роли app, db, jdauphant.nginx. Наше приложение теперь доступно по 80 порту. Плейбуки распределены по папкам. Чтобы запустить динамическую инвентаризацию для наших окружений (stage\prod) достаточно в файле **ansible.cfg** раскомментровать строчку:
+```
+#inventory = ./inventory.gcp.yml
+```
+и закомментировать:
+```
+inventory = ./environments/stage/inventory
+```
+
+
 

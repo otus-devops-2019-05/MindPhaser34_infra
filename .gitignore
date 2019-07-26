@@ -3,3 +3,7 @@
 *.tfstate.backup
 *.tfvars
 .terraform/
+*.retry
+key.json
+vault.key
+jdauphant.nginx

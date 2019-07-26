@@ -5,8 +5,8 @@
     msg: "This host is in {{ env }} environment!!!"
 
 - name: Add unit file for Puma
-  copy: 
-    src: puma.service 
+  copy:
+    src: puma.service
     dest: /etc/systemd/system/puma.service
   notify: reload puma
 
@@ -19,4 +19,3 @@
 
 - name: enable puma
   systemd: name=puma enabled=yes
-

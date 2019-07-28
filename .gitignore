@@ -9,8 +9,12 @@ vault.key
 jdauphant.nginx
 # Vagrant & molecule
 .vagrant/
+.vagrant.d/
 *.log
 *.pyc
 .molecule
 .cache
 .pytest_cache
+*Pipfile*
+.yamllint
+venv

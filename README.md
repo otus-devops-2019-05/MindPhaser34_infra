@@ -10,7 +10,7 @@
 - [Занятие 10: Управление конфигурацией](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/ansible-1#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-10-%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5-%D0%BA%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D0%B5%D0%B9)
 - [Занятие 11: Продолжение знакомства с Ansible: templates, handlers, dynamic inventory, vault, tags.](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/ansible-2#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-11-%D0%BF%D1%80%D0%BE%D0%B4%D0%BE%D0%BB%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B7%D0%BD%D0%B0%D0%BA%D0%BE%D0%BC%D1%81%D1%82%D0%B2%D0%B0-%D1%81-ansible-templates-handlers-dynamic-inventory-vault-tags)
 - [Занятие 12: Принципы организации кода для управления конфигурацией](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/ansible-3#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-12-%D0%BF%D1%80%D0%B8%D0%BD%D1%86%D0%B8%D0%BF%D1%8B-%D0%BE%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8-%D0%BA%D0%BE%D0%B4%D0%B0-%D0%B4%D0%BB%D1%8F-%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BA%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D0%B5%D0%B9)
-
+- [Занятие 13: Локальная разработка Ansible ролей с Vagrant. Тестирование конфигурации](https://github.com/otus-devops-2019-05/MindPhaser34_infra/tree/ansible-4#%D0%B7%D0%B0%D0%BD%D1%8F%D1%82%D0%B8%D0%B5-13-%D0%BB%D0%BE%D0%BA%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B0-ansible-%D1%80%D0%BE%D0%BB%D0%B5%D0%B9-%D1%81-vagrant-%D1%82%D0%B5%D1%81%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BA%D0%BE%D0%BD%D1%84%D0%B8%D0%B3%D1%83%D1%80%D0%B0%D1%86%D0%B8%D0%B8)
 
 ### Занятие 5: Знакомство с облачной инфраструктурой и облачными сервисами.
 Для выполнения задания были заведены 2 ВМ
@@ -393,5 +393,34 @@ ansible-inventory -i inventory.gcp.yml --graph
 inventory = ./environments/stage/inventory
 ```
 
+### Занятие 13: Локальная разработка Ansible ролей с Vagrant. Тестирование конфигурации.
+Выполнены задачи с настройкой и разворачиванием виртуальной машины с использованием Vagrant. Настроен nginx для доступа к приложения без указания порта.
+Выполнена самостоятельная работа. Выполнено тестрирование ролей с помощью molecule.
+Так как до этого вся работа выполнялась на виртуальной машине Ubuntu Server без графического интерфейса, то Vagrant отказался запскать образ в virtualbox. Пришлось перенести разработку на Windows-окружение с ипользованием WSL. При этом вылезло множество ньюансов, например в Vagrantfile необходимо внести следующие строчки:
+```shell
+...
+v.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
+...
+```
+иначе сборка образа просто не запускалась. Эту же строчку необходимо добавлять Vagrantfile модуля тестирования molecule.
+Для корректной работы Ansible & Vagrant необходимо занести следущие переменные
+```shell
+export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1" && export PATH="$PATH:/mnt/c/Program Files/Oracle/VirtualBox"
+export VAGRANT_WSL_WINDOWS_ACCESS_USER_HOME_PATH="/mnt/c/Dev/MindPhaser34_infra/ansible"
+export ANSIBLE_CONFIG="/mnt/c/Dev/MindPhaser34_infra/ansible/ansible.cfg"
+```
+А так же создать файл конфигурации для WSL
+```shell
+sudo vi /etc/wsl.conf
 
+[automount]
+enabled = true
+mountFsTab = false
+root = /mnt/
+options = "metadata,umask=22,fmask=11"
+
+[network]
+generateHosts = true
+generateResolvConf = true
+```
 

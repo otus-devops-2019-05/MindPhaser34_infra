@@ -394,4 +394,33 @@ inventory = ./environments/stage/inventory
 ```
 
 ### Занятие 13: Локальная разработка Ansible ролей с Vagrant. Тестирование конфигурации.
+Выполнены задачи с настройкой и разворачиванием виртуальной машины с использованием Vagrant. Настроен nginx для доступа к приложения без указания порта.
+Выполнена самостоятельная работа. Выполнено тестрирование ролей с помощью molecule.
+Так как до этого вся работа выполнялась на виртуальной машине Ubuntu Server без графического интерфейса, то Vagrant отказался запскать образ в virtualbox. Пришлось перенести разработку на Windows-окружение с ипользованием WSL. При этом вылезло множество ньюансов, например в Vagrantfile необходимо внести следующие строчки:
+```shell
+...
+v.customize [ "modifyvm", :id, "--uartmode1", "disconnected" ]
+...
+```
+иначе сборка образа просто не запускалась. Эту же строчку необходимо добавлять Vagrantfile модуля тестирования molecule.
+Для корректной работы Ansible & Vagrant необходимо занести следущие переменные
+```shell
+export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1" && export PATH="$PATH:/mnt/c/Program Files/Oracle/VirtualBox"
+export VAGRANT_WSL_WINDOWS_ACCESS_USER_HOME_PATH="/mnt/c/Dev/MindPhaser34_infra/ansible"
+export ANSIBLE_CONFIG="/mnt/c/Dev/MindPhaser34_infra/ansible/ansible.cfg"
+```
+А так же создать файл конфигурации для WSL
+```shell
+sudo vi /etc/wsl.conf
+
+[automount]
+enabled = true
+mountFsTab = false
+root = /mnt/
+options = "metadata,umask=22,fmask=11"
+
+[network]
+generateHosts = true
+generateResolvConf = true
+```
 
